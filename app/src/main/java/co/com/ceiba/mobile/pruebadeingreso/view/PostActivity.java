@@ -1,10 +1,13 @@
 package co.com.ceiba.mobile.pruebadeingreso.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,21 +24,56 @@ import java.util.ArrayList;
 
 import co.com.ceiba.mobile.pruebadeingreso.R;
 import co.com.ceiba.mobile.pruebadeingreso.adapter.PublicationAdapter;
-import co.com.ceiba.mobile.pruebadeingreso.entity.Publication;
+import co.com.ceiba.mobile.pruebadeingreso.data.Publication;
+import co.com.ceiba.mobile.pruebadeingreso.data.UserDbHelper;
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints;
+import dmax.dialog.SpotsDialog;
 
 public class PostActivity extends Activity {
 
-    JSONArray publications;
+    AlertDialog dialog;
     Endpoints endpoints;
+    JSONArray publications;
+    UserDbHelper mUserDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        mUserDbHelper = new UserDbHelper(this);
+        dialog = new SpotsDialog.Builder()
+                .setContext(this)
+                .setMessage("Cargando")
+                .build();
+
         String userId = getIntent().getStringExtra("user");
+
+        dialog.show();
+        getUser(userId);
+        getPublicationsWs(userId);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    private void getUser (String userId) {
+        TextView name = findViewById(R.id.name),
+                email = findViewById(R.id.email),
+                phone = findViewById(R.id.phone);
+
+        Cursor userData = mUserDbHelper.getUser(userId);
+        if (userData.moveToFirst()) {
+            name.setText(userData.getString(userData.getColumnIndex("name")));
+            email.setText(userData.getString(userData.getColumnIndex("email")));
+            phone.setText(userData.getString(userData.getColumnIndex("phone")));
+        }
+    }
+
+    private void getPublicationsWs(String userId) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JsonArrayRequest arrReq = new JsonArrayRequest(
                 Request.Method.GET,
@@ -45,21 +83,17 @@ public class PostActivity extends Activity {
                     public void onResponse(JSONArray response) {
                         publications = response;
                         loadPublications();
-                        Log.d("Users", "Respuesta en JSON: ");
+                        Log.d("Publications", "Response JSON: ");
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Users", "Error Respuesta en JSON: " + error.getMessage());
+                        Log.d("Publications", "Error Response JSON: " + error.getMessage());
                     }
                 });
-        requestQueue.add(arrReq);
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        requestQueue.add(arrReq);
     }
 
     private void loadPublications() {
@@ -85,6 +119,8 @@ public class PostActivity extends Activity {
         } catch (JSONException e){
             e.printStackTrace();
         }
+
+        dialog.dismiss();
     }
 
 }

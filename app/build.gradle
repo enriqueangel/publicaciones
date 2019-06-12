@@ -26,6 +26,10 @@ android {
 
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
@@ -54,4 +58,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     implementation 'com.mcxiaoke.volley:library:1.0.19'
+    implementation 'com.github.d-max:spots-dialog:1.1@aar'
 }

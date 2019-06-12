@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import co.com.ceiba.mobile.pruebadeingreso.R;
-import co.com.ceiba.mobile.pruebadeingreso.entity.Publication;
+import co.com.ceiba.mobile.pruebadeingreso.data.Publication;
 
 public class PublicationAdapter extends RecyclerView.Adapter<PublicationAdapter.PublicationViewHolder> {
     private List<Publication> publications;

@@ -1,6 +1,5 @@
 package co.com.ceiba.mobile.pruebadeingreso.adapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.com.ceiba.mobile.pruebadeingreso.R;
-import co.com.ceiba.mobile.pruebadeingreso.entity.User;
+import co.com.ceiba.mobile.pruebadeingreso.data.User;
 import co.com.ceiba.mobile.pruebadeingreso.view.PostActivity;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
@@ -22,7 +21,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     class UserViewHolder extends RecyclerView.ViewHolder {
         TextView name, phone, email;
         Button publicationsBtn;
-        String id;
+        int id;
 
         UserViewHolder(View itemView) {
             super(itemView);
@@ -36,7 +35,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), PostActivity.class);
-                    intent.putExtra("user", id);
+                    intent.putExtra("user", String.valueOf(id));
                     v.getContext().startActivity(intent);
                 }
             });

@@ -1,4 +1,4 @@
-package co.com.ceiba.mobile.pruebadeingreso.entity;
+package co.com.ceiba.mobile.pruebadeingreso.data;
 
 public class Publication {
     private String title;

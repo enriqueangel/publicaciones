@@ -15,10 +15,12 @@ import co.com.ceiba.mobile.pruebadeingreso.R;
 import co.com.ceiba.mobile.pruebadeingreso.data.User;
 import co.com.ceiba.mobile.pruebadeingreso.view.PostActivity;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<User> users;
+    public static final int VIEW_TYPE_EMPTY = 0;
+    public static final int VIEW_TYPE_NORMAL = 1;
 
-    class UserViewHolder extends RecyclerView.ViewHolder {
+    class UserViewHolder extends BaseViewHolder {
         TextView name, phone, email;
         Button publicationsBtn;
         int id;
@@ -40,6 +42,28 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 }
             });
         }
+
+        public void onBind(int position){
+            super.onBind(position);
+
+            name.setText(users.get(position).getName());
+            email.setText(users.get(position).getEmail());
+            phone.setText(users.get(position).getPhone());
+            id = users.get(position).getId();
+        }
+
+        @Override
+        protected void clear() {}
+    }
+
+    public class UserEmptyViewHolder extends BaseViewHolder {
+
+        UserEmptyViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        protected void clear() {}
     }
 
     public UserAdapter(List<User> users) {
@@ -47,23 +71,39 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     @Override
-    public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.user_list_item, parent, false);
-        return new UserAdapter.UserViewHolder(v);
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case VIEW_TYPE_NORMAL:
+                return new UserViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, parent, false));
+            case VIEW_TYPE_EMPTY:
+            default:
+                return new UserEmptyViewHolder(
+                        LayoutInflater.from(parent.getContext()).inflate(R.layout.empty_view, parent, false));
+        }
     }
 
     @Override
-    public void onBindViewHolder(UserViewHolder holder, int position) {
-        holder.name.setText(users.get(position).getName());
-        holder.email.setText(users.get(position).getEmail());
-        holder.phone.setText(users.get(position).getPhone());
-        holder.id = users.get(position).getId();
+    public void onBindViewHolder(BaseViewHolder holder, int position) {
+        holder.onBind(position);
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        if (users != null && users.size() > 0) {
+            return users.size();
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (users != null && users.size() > 0) {
+            return VIEW_TYPE_NORMAL;
+        } else {
+            return VIEW_TYPE_EMPTY;
+        }
     }
 
     public void setFilter(ArrayList<User> list) {

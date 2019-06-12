@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 
 import com.android.volley.Request;
@@ -40,6 +42,7 @@ public class MainActivity extends Activity {
     RecyclerView content;
     UserAdapter userAdapter;
     UserDbHelper mUserDbHelper;
+    LayoutInflater mInflate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         EditText search = findViewById(R.id.editTextSearch);
+        mInflate = LayoutInflater.from(this);
+
+        content = findViewById(R.id.recyclerViewSearchResults);
+        content.setHasFixedSize(true);
+
+        LinearLayoutManager linear =  new LinearLayoutManager(this);
+        linear.setOrientation(LinearLayoutManager.VERTICAL);
+        content.setLayoutManager(linear);
 
         mUserDbHelper = new UserDbHelper(this);
         dialog = new SpotsDialog.Builder()
@@ -68,6 +79,7 @@ public class MainActivity extends Activity {
                 } else {
                     filterList = filter(userList, s.toString());
                 }
+
                 userAdapter.setFilter(filterList);
             }
 
@@ -77,8 +89,22 @@ public class MainActivity extends Activity {
             }
         });
 
+        final View emptyView = mInflate.inflate(R.layout.empty_view, null, false);
+
         dialog.show();
         getUsersWs();
+
+        /*userAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if (userAdapter.getItemCount() == 0) {
+                    emptyView.setVisibility(View.VISIBLE);
+                } else {
+                    emptyView.setVisibility(View.GONE);
+                }
+            }
+        });*/
     }
 
     @Override
@@ -140,15 +166,8 @@ public class MainActivity extends Activity {
                 }
             }
 
-            content = findViewById(R.id.recyclerViewSearchResults);
-            content.setHasFixedSize(true);
-
-            LinearLayoutManager linear =  new LinearLayoutManager(this);
-            linear.setOrientation(LinearLayoutManager.VERTICAL);
-
             userAdapter = new UserAdapter(userList);
             content.setAdapter(userAdapter);
-            content.setLayoutManager(linear);
         } catch (JSONException e){
             e.printStackTrace();
         }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -27,7 +28,6 @@ import co.com.ceiba.mobile.pruebadeingreso.adapter.PublicationAdapter;
 import co.com.ceiba.mobile.pruebadeingreso.data.Publication;
 import co.com.ceiba.mobile.pruebadeingreso.data.UserDbHelper;
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints;
-import dmax.dialog.SpotsDialog;
 
 public class PostActivity extends Activity {
 
@@ -42,14 +42,15 @@ public class PostActivity extends Activity {
         setContentView(R.layout.activity_post);
 
         mUserDbHelper = new UserDbHelper(this);
-        dialog = new SpotsDialog.Builder()
-                .setContext(this)
-                .setMessage("Cargando")
-                .build();
+        AlertDialog.Builder mDialog = new AlertDialog.Builder(this);
+        mDialog.setMessage("Cargando...");
+        dialog = mDialog.create();
+        dialog.show();
+        TextView message = dialog.findViewById(android.R.id.message);
+        message.setGravity(Gravity.CENTER_HORIZONTAL);
 
         String userId = getIntent().getStringExtra("user");
 
-        dialog.show();
         getUser(userId);
         getPublicationsWs(userId);
     }
@@ -83,7 +84,6 @@ public class PostActivity extends Activity {
                     public void onResponse(JSONArray response) {
                         publications = response;
                         loadPublications();
-                        Log.d("Publications", "Response JSON: ");
                     }
                 },
                 new Response.ErrorListener() {

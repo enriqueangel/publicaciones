@@ -9,9 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,7 +32,6 @@ import co.com.ceiba.mobile.pruebadeingreso.adapter.UserAdapter;
 import co.com.ceiba.mobile.pruebadeingreso.data.User;
 import co.com.ceiba.mobile.pruebadeingreso.data.UserDbHelper;
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints;
-import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends Activity {
 
@@ -60,16 +60,16 @@ public class MainActivity extends Activity {
         content.setLayoutManager(linear);
 
         mUserDbHelper = new UserDbHelper(this);
-        dialog = new SpotsDialog.Builder()
-                .setContext(this)
-                .setMessage("Cargando")
-                .build();
+        AlertDialog.Builder mDialog = new AlertDialog.Builder(this);
+        mDialog.setMessage("Cargando...");
+        dialog = mDialog.create();
+        dialog.show();
+        TextView message = dialog.findViewById(android.R.id.message);
+        message.setGravity(Gravity.CENTER_HORIZONTAL);
 
         search.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -84,27 +84,10 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
-        final View emptyView = mInflate.inflate(R.layout.empty_view, null, false);
-
-        dialog.show();
         getUsersWs();
-
-        /*userAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                if (userAdapter.getItemCount() == 0) {
-                    emptyView.setVisibility(View.VISIBLE);
-                } else {
-                    emptyView.setVisibility(View.GONE);
-                }
-            }
-        });*/
     }
 
     @Override
@@ -123,7 +106,6 @@ public class MainActivity extends Activity {
                     public void onResponse(JSONArray response) {
                         users = response;
                         loadUsers();
-                        Log.d("Users", "Response JSON: ");
                     }
                 },
                 new Response.ErrorListener() {
@@ -168,11 +150,11 @@ public class MainActivity extends Activity {
 
             userAdapter = new UserAdapter(userList);
             content.setAdapter(userAdapter);
+            dialog.dismiss();
         } catch (JSONException e){
             e.printStackTrace();
         }
 
-        dialog.dismiss();
     }
 
     private ArrayList<User> filter(ArrayList<User> list, String text) {
